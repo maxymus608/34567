@@ -6,12 +6,13 @@
 <title>Картка продукту</title>
 <style>
 :root{--bg:#0a0a0a;--card:#141010;--line:#2a1c1e;--text:#f2eaea;--muted:#a39a9a;--accent:#b3121f;--accent2:color-mix(in srgb,var(--accent) 55%,#000);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:radial-gradient(900px 500px at 50% -10%,color-mix(in srgb,var(--accent) 30%,transparent),transparent),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px 16px}
 .card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px color-mix(in srgb,var(--accent) 15%,transparent);position:relative}
 .badge{position:absolute;top:16px;right:16px;background:var(--accent2);color:#fff;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
 .icon{width:110px;height:110px;margin:8px auto 20px;border-radius:50%;display:grid;place-items:center;font-size:52px;background:radial-gradient(circle at 30% 30%,var(--accent),var(--accent2) 70%,#000);box-shadow:0 0 40px color-mix(in srgb,var(--accent) 55%,transparent)}
+.icon{overflow:hidden}
+.icon img{width:100%;height:100%;object-fit:cover}
 h1{margin:0 0 8px;font-size:28px}
 .tag{margin:0 0 22px;color:var(--muted);line-height:1.5}
 ul{list-style:none;margin:0 0 24px;padding:0;text-align:left}
@@ -22,17 +23,6 @@ li::before{content:"✓";color:var(--accent);font-weight:700}
 .btn{display:block;margin-top:16px;padding:15px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;font-weight:600;font-size:16px;transition:transform .15s,filter .15s}
 .btn:hover{transform:translateY(-2px);filter:brightness(1.15)}
 .foot{margin-top:20px;font-size:12px;color:var(--muted)}
-#gear{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:22px;cursor:pointer;z-index:5}
-#panel{position:fixed;top:0;right:0;bottom:0;width:min(340px,100%);background:#0f0b0b;border-left:1px solid var(--line);padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));overflow-y:auto;transform:translateX(100%);transition:transform .25s;z-index:10}
-#panel.open{transform:none}
-#panel h2{margin:0 0 12px;font-size:18px}
-#panel label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px}
-#panel input,#panel textarea{width:100%;background:#181212;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px;font:inherit}
-#panel input[type=color]{padding:2px;height:40px}
-#panel textarea{min-height:110px;resize:vertical}
-.row{display:flex;gap:8px;margin-top:18px}
-.row button{flex:1;padding:10px;border-radius:8px;border:1px solid var(--line);background:#181212;color:var(--text);cursor:pointer}
-.row button.p{background:var(--accent2);border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -47,75 +37,42 @@ li::before{content:"✓";color:var(--accent);font-weight:700}
   <div class="foot" id="footer"></div>
 </main>
 
-<button id="gear" aria-label="Налаштування">⚙</button>
-<aside id="panel"><h2>Налаштування</h2><div id="fields"></div>
-  <div class="row"><button class="p" id="save">Закрити</button><button id="reset">Скинути</button></div>
-</aside>
-
 <script>
-// ===== НАЛАШТУВАННЯ ЗА ЗАМОВЧУВАННЯМ: змініть тут, щоб зафіксувати у файлі =====
+// ===== НАЛАШТУВАННЯ: змінюйте значення тут =====
 const CONFIG = {
-  editMode: true, // поставте false, щоб сховати кнопку налаштувань на готовому сайті
   emoji: "🔥",
-  badge: "Новинка",
+  image: "",                     // шлях до вашого фото, напр. "photo.jpg" (файл поруч з index.html). Порожньо — буде емодзі
+  badge: "Новинка",              // порожній рядок "" — сховати
   name: "Назва продукту",
   tagline: "Коротко про те, чим ваш продукт корисний для клієнта.",
-  features: "Перша перевага\nДруга перевага\nТретя перевага\nГарантія 12 місяців",
+  features: [
+    "Перша перевага",
+    "Друга перевага",
+    "Третя перевага",
+    "Гарантія 12 місяців"
+  ],
   price: "1 499 ₴",
-  oldPrice: "1 999 ₴",
+  oldPrice: "1 999 ₴",          // порожній рядок "" — сховати
   button: "Замовити зараз",
-  link: "#",
+  link: "https://youtu.be/QrwhVvf8dvA?si=JydHFejKoHpCRsHw", // https://…, tel:…, mailto:…
   footer: "© 2026 Ваш бренд",
-  accent: "#b3121f"
+  accent: "#b3121f"              // головний червоний колір
 };
-// ===========================================================================
-const FIELDS = [
-  ["emoji","Іконка (емодзі)"],["badge","Бейдж (порожньо — сховати)"],["name","Назва"],
-  ["tagline","Опис","area"],["features","Переваги (кожна з нового рядка)","area"],
-  ["price","Ціна"],["oldPrice","Стара ціна (порожньо — сховати)"],
-  ["button","Текст кнопки"],["link","Посилання кнопки (https://…, tel:…, mailto:…)"],
-  ["footer","Підпис внизу"],["accent","Акцентний колір","color"]
-];
-const KEY = "product-card-v1";
-let state = {...CONFIG};
-try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e) {}
+// ===============================================
 const $ = id => document.getElementById(id);
-
-function render(){
-  for (const k of ["emoji","badge","name","tagline","price","oldPrice","button","footer"]) $(k).textContent = state[k];
-  $("badge").style.display = state.badge ? "" : "none";
-  $("oldPrice").style.display = state.oldPrice ? "" : "none";
-  const ul = $("features"); ul.innerHTML = "";
-  state.features.split("\n").map(s => s.trim()).filter(Boolean).forEach(t => {
-    const li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
-  });
-  const ok = /^(https?:|mailto:|tel:|#)/i.test(state.link.trim());
-  $("button").href = ok ? state.link.trim() : "#";
-  document.documentElement.style.setProperty("--accent", state.accent);
-  document.title = state.name;
+for (const k of ["emoji","badge","name","tagline","price","oldPrice","button","footer"]) $(k).textContent = CONFIG[k];
+$("badge").hidden = !CONFIG.badge;
+$("oldPrice").hidden = !CONFIG.oldPrice;
+CONFIG.features.forEach(t => { const li = document.createElement("li"); li.textContent = t; $("features").appendChild(li); });
+if (CONFIG.image) {
+  const img = document.createElement("img");
+  img.src = CONFIG.image; img.alt = CONFIG.name;
+  $("emoji").textContent = ""; $("emoji").appendChild(img);
 }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
-
-const box = $("fields");
-FIELDS.forEach(([k,label,type]) => {
-  const l = document.createElement("label"); l.textContent = label;
-  const el = document.createElement(type === "area" ? "textarea" : "input");
-  if (type === "color") el.type = "color";
-  el.value = state[k];
-  el.addEventListener("input", () => { state[k] = el.value; render(); save(); });
-  box.append(l, el);
-});
-
-if (!CONFIG.editMode) { $("gear").style.display = "none"; }
-$("gear").onclick = () => $("panel").classList.toggle("open");
-$("save").onclick = () => $("panel").classList.remove("open");
-$("reset").onclick = () => {
-  try { localStorage.removeItem(KEY); } catch(e) {}
-  state = {...CONFIG};
-  [...box.querySelectorAll("input,textarea")].forEach((el,i) => el.value = state[FIELDS[i][0]]);
-  render();
-};
-render();
+$("button").href = CONFIG.link;
+if (/^https?:/i.test(CONFIG.link)) { $("button").target = "_blank"; $("button").rel = "noopener"; }
+document.documentElement.style.setProperty("--accent", CONFIG.accent);
+document.title = CONFIG.name;
 </script>
 </body>
 </html>
